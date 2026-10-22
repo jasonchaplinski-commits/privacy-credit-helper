@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clean Slate</title>
+<meta name="description" content="Free self-help tool to remove your info from people-search sites, dispute credit report errors and handle collections. Your info stays on your device.">
+<style>
+:root{
+  --bg:#f6f5f1; --card:#ffffff; --ink:#1f2421; --muted:#5d655f; --line:#dedbd2;
+  --accent:#2f6b4f; --accent-ink:#ffffff; --soft:#e7f0ea; --warn:#9a5b00; --warn-soft:#fbf0dc;
+  --bad:#a23b2a; --bad-soft:#f8e3df; --ok:#2f6b4f; --ok-soft:#e1efe6; --chip:#efede7;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#151816; --card:#1e2320; --ink:#e7ebe8; --muted:#a3aca6; --line:#323a35;
+    --accent:#6fbf93; --accent-ink:#0f1a14; --soft:#21332a; --warn:#e0a84a; --warn-soft:#3a2f1c;
+    --bad:#ec8c7c; --bad-soft:#3d2420; --ok:#6fbf93; --ok-soft:#1f3328; --chip:#2a302c;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+a{color:var(--accent)}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+.brand{display:flex;align-items:center;gap:10px;padding:12px 0 6px}
+.brand h1{font-size:20px;margin:0}
+.brand span{color:var(--muted);font-size:13px}
+nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;scrollbar-width:none}
+nav button{flex:0 0 auto;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:7px 12px;border-radius:999px;font-size:14px;cursor:pointer}
+nav button.on{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{padding:16px 0 60px}
+section.tab{display:none}
+section.tab.on{display:block}
+h2{font-size:22px;margin:4px 0 8px}
+h3{font-size:17px;margin:0 0 8px}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin:0 0 14px}
+.note{background:var(--soft);border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:14px}
+.warn{background:var(--warn-soft);border-radius:10px;padding:12px 14px;margin:0 0 14px;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+.grid .full{grid-column:1/-1}
+@media (max-width:640px){.grid{grid-template-columns:1fr}}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:3px}
+input,select,textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+textarea{min-height:70px;resize:vertical}
+button.btn{font:inherit;font-size:14px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);border-radius:8px;padding:8px 14px;cursor:pointer}
+button.btn.ghost{background:transparent;color:var(--accent)}
+button.btn.danger{border-color:var(--bad);background:transparent;color:var(--bad)}
+button.btn.sm{padding:5px 10px;font-size:13px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.list{display:flex;flex-direction:column;gap:10px}
+.item{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--card)}
+.item .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;flex-wrap:wrap}
+.item .name{font-weight:600}
+.chip{display:inline-block;white-space:nowrap;font-size:12px;padding:2px 8px;border-radius:999px;background:var(--chip);color:var(--muted);margin-right:4px}
+.chip.ok{background:var(--ok-soft);color:var(--ok)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.item select{width:auto;min-width:150px;font-size:14px;padding:5px 8px}
+.item input[type=date]{width:auto;font-size:14px;padding:4px 8px}
+.progress{height:8px;background:var(--chip);border-radius:99px;overflow:hidden;margin:6px 0 4px}
+.progress div{height:100%;background:var(--accent)}
+.steps{margin:0;padding-left:20px}
+.steps li{margin-bottom:6px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+.scroll{overflow-x:auto}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;padding:16px;z-index:20}
+.modal.on{display:flex}
+.modal .box{background:var(--card);border-radius:12px;max-width:760px;width:100%;max-height:92vh;display:flex;flex-direction:column;padding:16px}
+.modal textarea{flex:1;min-height:50vh;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;line-height:1.45}
+.deadline{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:14px}
+.deadline:last-child{border-bottom:0}
+details summary{cursor:pointer;font-weight:600}
+details{margin-bottom:8px}
+footer{color:var(--muted);font-size:12px;text-align:center;padding:20px 16px 40px}
+@media print{header,nav,footer,.noprint{display:none!important}}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="brand"><h1>Clean Slate</h1><span>privacy · credit · collections · tickets</span></div>
+    <nav id="nav">
+      <button data-tab="home" class="on">Start</button>
+      <button data-tab="remove">Remove my info</button>
+      <button data-tab="credit">Credit</button>
+      <button data-tab="debts">Collections</button>
+      <button data-tab="tickets">Traffic tickets</button>
+      <button data-tab="spam">Stop spam</button>
+      <button data-tab="backup">Backup</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- START -->
+<section class="tab on" id="tab-home">
+  <div class="note"><b>Your info never leaves this device.</b> Everything you type is saved only in this browser on this phone or computer. Nobody else who uses this link can see it, and there's no account or server. Use <a href="#" data-go="backup">Backup</a> to save a copy.</div>
+
+  <div class="card">
+    <h3>Coming up</h3>
+    <div id="deadlines"></div>
+  </div>
+
+  <div class="card">
+    <h3>Progress</h3>
+    <div id="progress"></div>
+  </div>
+
+  <div class="card">
+    <h3>About you</h3>
+    <p class="muted small">Used only to fill in your letters and emails. Never enter your Social Security number or full account numbers here; write those in by hand on paper letters.</p>
+    <div class="grid" id="profileForm">
+      <div><label>Full legal name</label><input data-p="name" autocomplete="name"></div>
+      <div><label>Other names used (maiden, nicknames, middle initial)</label><input data-p="otherNames"></div>
+      <div class="full"><label>Street address</label><input data-p="street" autocomplete="street-address"></div>
+      <div><label>City</label><input data-p="city" autocomplete="address-level2"></div>
+      <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">
+        <div><label>State</label><select data-p="state" id="stateSel"></select></div>
+        <div><label>ZIP</label><input data-p="zip" autocomplete="postal-code" inputmode="numeric"></div>
+      </div>
+      <div class="full"><label>Past addresses (one per line, last 10 years)</label><textarea data-p="pastAddresses"></textarea></div>
+      <div><label>Phone numbers (current and past)</label><input data-p="phones"></div>
+      <div><label>Email for confirmations</label><input data-p="email" type="email" autocomplete="email"></div>
+      <div class="full"><label>Year of birth (some sites ask to match your listing; optional)</label><input data-p="birthYear" inputmode="numeric" style="max-width:140px"></div>
+    </div>
+    <p class="small muted" style="margin-top:8px">Saved automatically.</p>
+  </div>
+
+  <div class="card">
+    <h3>How this works</h3>
+    <ol class="steps">
+      <li><b>Remove my info:</b> work down the list of people-search sites and data brokers. Find your listing, submit the opt-out, mark it requested. The app reminds you to re-check in 90 days, because sites often re-list people.</li>
+      <li><b>Credit:</b> pull your free reports, log anything wrong, and print a dispute letter for each one. The bureau generally has 30 days to investigate.</li>
+      <li><b>Traffic tickets:</b> your options in your state, deadlines, and letters to plead not responsible, request evidence or ask for a reduction.</li>
+      <li><b>Stop spam:</b> a checklist to cut spam calls, texts, emails and junk mail.</li>
+      <li><b>Collections:</b> ask the collector to prove the debt, check how old it is, then use the letters and offer log to negotiate a settlement in writing.</li>
+    </ol>
+    <p class="small muted">This is a free self-help tool, not legal, tax or financial advice. Laws vary by state; for a lawsuit, garnishment or big decision, talk to a lawyer, a nonprofit credit counselor or legal aid.</p>
+  </div>
+</section>
+
+<!-- REMOVE -->
+<section class="tab" id="tab-remove">
+  <h2>Remove my info</h2>
+  <div class="note">For each site: open it, search your name and city, and if you're listed, submit the opt-out (most ask for the listing's web address and an email to confirm). Then set the status here. <b>Tip:</b> use your confirmation email above, and check spam for confirmation links.</div>
+  <div class="note" id="lawNote"></div>
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <div><b id="remCount"></b></div>
+      <div class="row">
+        <button class="btn ghost sm" id="googleMe">Search Google for me</button>
+        <button class="btn ghost sm" id="emailReq">Email removal request</button>
+      </div>
+    </div>
+    <div class="progress"><div id="remBar" style="width:0"></div></div>
+  </div>
+  <div id="brokerGroups"></div>
+  <div class="card">
+    <h3>Add another site</h3>
+    <div class="grid">
+      <div><label>Site name</label><input id="cName"></div>
+      <div><label>Opt-out page or privacy email</label><input id="cUrl" placeholder="https://… or privacy@…"></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="cAdd">Add site</button></div>
+  </div>
+</section>
+
+<!-- CREDIT -->
+<section class="tab" id="tab-credit">
+  <h2>Credit</h2>
+  <div class="card">
+    <h3>1 · Get your free reports</h3>
+    <p>All three bureaus give free weekly reports at <a href="https://www.annualcreditreport.com/" target="_blank" rel="noopener">AnnualCreditReport.com</a> (the only official free site). Download each as a PDF and keep them in a private folder.</p>
+    <details><summary>What to look for</summary>
+      <ul class="steps">
+        <li>Names, addresses or employers that aren't yours</li>
+        <li>Accounts you never opened (possible identity theft: also file at <a href="https://www.identitytheft.gov/" target="_blank" rel="noopener">IdentityTheft.gov</a>)</li>
+        <li>Late payments you didn't make, or wrong dates</li>
+        <li>Wrong balances or credit limits (a missing limit can hurt your score)</li>
+        <li>Closed accounts showing open, or paid accounts showing a balance</li>
+        <li>The same debt listed twice (original lender and collector both showing a balance)</li>
+        <li>Negative items older than about 7 years from the first missed payment</li>
+        <li>Hard inquiries you didn't authorize</li>
+      </ul>
+    </details>
+    <details><summary>Denied for a card or loan?</summary>
+      <p>The lender must send an "adverse action" notice listing the main reasons and which bureau it used. If you didn't get one, or it's vague, use <b>Ask a lender why I was denied</b> below. Common causes when credit is good: <b>a credit freeze</b> on the bureau they pulled, too many recent applications or new accounts, no existing relationship with that bank, or income/identity checks.</p>
+    </details>
+    <details><summary>Credit freezes (free)</summary>
+      <p>A freeze blocks new accounts in your name. Lift it temporarily before you apply for credit, then re-freeze.
+      <a href="https://www.equifax.com/personal/credit-report-services/credit-freeze/" target="_blank" rel="noopener">Equifax</a> ·
+      <a href="https://www.experian.com/freeze/center.html" target="_blank" rel="noopener">Experian</a> ·
+      <a href="https://www.transunion.com/credit-freeze" target="_blank" rel="noopener">TransUnion</a></p>
+      <p>Stop prescreened credit card offers: <a href="https://www.optoutprescreen.com/" target="_blank" rel="noopener">OptOutPrescreen.com</a>.</p>
+    </details>
+  </div>
+
+  <div class="card">
+    <h3>2 · Log anything wrong</h3>
+    <div class="grid">
+      <div><label>Send to</label><select id="crTo"><option>Equifax</option><option>Experian</option><option>TransUnion</option><option>All three bureaus</option><option>The creditor directly</option></select></div>
+      <div><label>Company on the report</label><input id="crCo" placeholder="e.g. Capital One"></div>
+      <div><label>Last 4 of account # (optional)</label><input id="crAcct" maxlength="4" inputmode="numeric"></div>
+      <div><label>Problem</label><select id="crType">
+        <option>Not my account</option><option>Late payment reported in error</option><option>Wrong balance or credit limit</option>
+        <option>Account shows open but is closed</option><option>Paid or settled but shows a balance</option><option>Duplicate account</option>
+        <option>Too old to report (over 7 years)</option><option>Inquiry I didn't authorize</option><option>Wrong personal information</option><option>Other</option></select></div>
+      <div class="full"><label>What's wrong and what it should say</label><textarea id="crWhy" placeholder="e.g. Shows 30 days late for March 2025. I paid on time; bank statement attached."></textarea></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="crAdd">Add to my list</button></div>
+  </div>
+
+  <div class="card">
+    <h3>3 · Send letters and track results</h3>
+    <p class="small muted">Mail letters certified with return receipt so you have proof of the date. The bureau generally has 30 days (45 if you sent it after getting your free annual report) and must send you the results in writing.</p>
+    <div class="list" id="crList"></div>
+  </div>
+
+  <div class="card">
+    <h3>Other letters</h3>
+    <div class="row">
+      <button class="btn ghost sm" id="goodwillBtn">Goodwill letter (remove a late payment)</button>
+      <button class="btn ghost sm" id="denialBtn">Ask a lender why I was denied</button>
+    </div>
+    <p class="small muted" style="margin-top:8px">If a bureau or company won't fix a real error, you can file a free complaint with the <a href="https://www.consumerfinance.gov/complaint/" target="_blank" rel="noopener">CFPB</a>.</p>
+  </div>
+</section>
+
+<!-- DEBTS -->
+<section class="tab" id="tab-debts">
+  <h2>Collections & settlements</h2>
+  <div class="card">
+    <h3>Know your rights first</h3>
+    <ul class="steps">
+      <li><b>Make them prove it.</b> Within 30 days of a collector's first notice, send a validation request. They must pause collection until they respond with proof.</li>
+      <li><b>Check the age.</b> Each state limits how long a creditor can sue. <span id="solText"></span> In some states a payment, or even agreeing you owe it, can restart that clock, so look into an old debt <i>before</i> paying or promising anything.</li>
+      <li><b>Get the deal in writing before you pay.</b> The agreement should name the exact amount, say it settles the debt in full, and say how it will be reported.</li>
+      <li><b>Never give a collector ongoing access to your bank account.</b> Pay once, by cashier's check or a one-time payment, and keep proof.</li>
+      <li><b>Don't ignore a lawsuit.</b> If you're served court papers, respond by the deadline or you can lose automatically (then wages or bank accounts can be garnished). Contact legal aid or a lawyer.</li>
+    </ul>
+  </div>
+
+  <details class="card"><summary>"Let it default, then settle": the trade-offs</summary>
+    <div style="margin-top:10px" class="scroll">
+    <table>
+      <tr><th>What can happen</th><th>Details</th></tr>
+      <tr><td>Credit damage</td><td>Late payments and a charge-off stay on your report about 7 years. Scores usually drop sharply.</td></tr>
+      <tr><td>Lawsuit</td><td>While you're not paying, the creditor can sue. A judgment can lead to wage garnishment or a bank levy.</td></tr>
+      <tr><td>Balance grows</td><td>Interest and fees keep adding while you save up a lump sum.</td></tr>
+      <tr><td>Taxes</td><td>Forgiven debt of $600 or more usually brings a 1099-C. The forgiven amount can be taxable income unless you were insolvent (IRS Form 982).</td></tr>
+      <tr><td>Fees</td><td>Settlement companies often charge 15 to 25% of the enrolled debt. Doing it yourself avoids that.</td></tr>
+      <tr><td>Other options</td><td>A nonprofit credit counseling <b>debt management plan</b> can lower interest rates without defaulting. Bankruptcy is sometimes the better fit. Compare before choosing.</td></tr>
+    </table></div>
+  </details>
+
+  <div class="card">
+    <h3>Add a debt</h3>
+    <div class="grid">
+      <div><label>Collector (or creditor) name</label><input id="dCol"></div>
+      <div><label>Original creditor</label><input id="dOrig"></div>
+      <div><label>Balance they say you owe ($)</label><input id="dBal" inputmode="decimal"></div>
+      <div><label>Last 4 of account / reference #</label><input id="dAcct" maxlength="6"></div>
+      <div><label>Date of their first letter to you</label><input id="dFirst" type="date"></div>
+      <div><label>Date of your last payment (if known)</label><input id="dLast" type="date"></div>
+      <div class="full"><label>Collector mailing address</label><textarea id="dAddr" style="min-height:50px"></textarea></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="dAdd">Add debt</button></div>
+  </div>
+  <div class="list" id="dList"></div>
+</section>
+
+<!-- TICKETS -->
+<section class="tab" id="tab-tickets">
+  <h2>Traffic tickets</h2>
+  <div class="warn"><b>Never ignore a ticket you were handed or formally served.</b> Missing the court or "appear by" date usually means you're found responsible automatically, plus a license suspension and extra fees.</div>
+  <div class="card" id="tkState"></div>
+  <div class="card">
+    <h3>Add a ticket</h3>
+    <div class="grid">
+      <div><label>Violation (as written on the ticket)</label><input id="tViol" placeholder="e.g. Speed 15 over, red light"></div>
+      <div><label>Citation / complaint #</label><input id="tNum"></div>
+      <div><label>Date of the ticket</label><input id="tDate" type="date"></div>
+      <div><label>Court date / "appear by" date</label><input id="tCourt" type="date"></div>
+      <div><label>Court name</label><input id="tCourtName" placeholder="e.g. Mesa Municipal Court"></div>
+      <div><label>Fine on the ticket ($, if listed)</label><input id="tFine" inputmode="decimal"></div>
+      <div><label>Type</label><select id="tType"><option>Officer stop (handed to me)</option><option>Photo radar / red-light camera</option><option>Parking</option></select></div>
+      <div><label>Did you take traffic school in the last 12 months?</label><select id="tPrev"><option>No</option><option>Yes</option><option>Not sure</option></select></div>
+    </div>
+    <div class="row" style="margin-top:10px"><button class="btn sm" id="tAdd">Add ticket</button></div>
+  </div>
+  <div class="list" id="tList"></div>
+  <details class="card"><summary>Getting ready for a hearing</summary>
+    <ul class="steps" style="margin-top:10px">
+      <li>Go back to the spot. Take photos of speed-limit signs (or missing / hidden signs), the intersection, lights and sight lines.</li>
+      <li>Save dashcam video, phone GPS history or a receipt that shows where you were and when.</li>
+      <li>Ask for the evidence early (use the <b>Evidence request</b> letter): officer notes, radar or laser calibration and training records, and any dashcam or bodycam video.</li>
+      <li>Write down what happened while it's fresh: weather, traffic, what the officer said.</li>
+      <li>At the hearing, be calm and brief. Ask the officer questions about how they measured your speed and when the device was last checked.</li>
+    </ul>
+  </details>
+  <details class="card"><summary>Can a ticket be removed from my record?</summary>
+    <p style="margin-top:10px">Usually not once you've been found responsible, so the best time to act is <b>before</b> the court date: traffic school, a hearing, or a request to reduce the charge can keep it off your record. After that, points stop counting toward suspension over time (in Arizona, suspensions are based on points in the last 12 months), and insurers usually look back about 3 to 5 years. If something on your driving record is wrong, ask the court and your state's motor vehicle department to correct it.</p>
+  </details>
+  <p class="small muted">About ticket apps: some connect you to a real lawyer for a fee; others just write a letter for you. "Robot lawyer" apps have been fined by the FTC for overpromising. For criminal charges (DUI, reckless driving, very high speeds, driving on a suspended license) talk to a lawyer.</p>
+</section>
+
+<!-- SPAM -->
+<section class="tab" id="tab-spam">
+  <h2>Stop spam calls, texts & email</h2>
+  <div class="note">No single step stops all spam, but these together cut it way down. Check each one off as you do it. Removing your listings on the <a href="#" data-go="remove">Remove my info</a> tab also helps, because spammers buy phone numbers and emails from those sites.</div>
+  <div class="card"><div class="row" style="justify-content:space-between"><b id="spamCount"></b></div><div class="progress"><div id="spamBar" style="width:0"></div></div></div>
+  <div id="spamGroups"></div>
+  <div class="card">
+    <h3>Golden rules</h3>
+    <ul class="steps">
+      <li>Don't answer unknown numbers. Let them go to voicemail; real callers leave a message.</li>
+      <li>If you do answer a robocall, hang up. Don't press a number to "be removed" and don't say "yes"; it just confirms your number works.</li>
+      <li>Never click links in surprise texts or emails, even ones that look like your bank, a delivery or the IRS. Go to the company's site or app yourself.</li>
+      <li>Don't click "unsubscribe" in an email you think is a scam. Only unsubscribe from companies you actually signed up with.</li>
+      <li>Nobody legitimate asks you to pay with gift cards, crypto or wire transfers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- BACKUP -->
+<section class="tab" id="tab-backup">
+  <h2>Backup</h2>
+  <div class="card">
+    <p>Your info is saved only in this browser. Clearing browser data, using private mode, or switching phones will lose it, so download a backup now and then. The backup file contains your personal details; keep it somewhere private.</p>
+    <div class="row">
+      <button class="btn" id="bkDown">Download backup</button>
+      <button class="btn ghost" id="bkUp">Restore from backup</button>
+      <input type="file" id="bkFile" accept=".json,application/json" style="display:none">
+    </div>
+  </div>
+  <div class="card">
+    <h3>Start over</h3>
+    <p class="muted small">Erases everything this app saved on this device.</p>
+    <button class="btn danger" id="bkErase">Erase all my data</button>
+  </div>
+  <div class="card">
+    <h3>Sharing this app</h3>
+    <p>Send a friend this page's link. They'll start with a blank copy; nothing you entered goes with it.</p>
+    <button class="btn ghost sm" id="copyLink">Copy link</button>
+  </div>
+</section>
+</main>
+
+<footer>Clean Slate is a free self-help tool. Not legal, tax or financial advice. Not affiliated with any site or company listed.</footer>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px"><h3 id="mTitle" style="margin:0"></h3><button class="btn ghost sm" id="mClose">Close</button></div>
+    <p class="small muted" id="mHint" style="margin-bottom:8px"></p>
+    <textarea id="mText"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn sm" id="mCopy">Copy</button>
+      <button class="btn ghost sm" id="mPrint">Print</button>
+      <button class="btn ghost sm" id="mMail" style="display:none">Open in email</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var KEY = "cleanSlate.v1";
+var mem = null;
+
+var BROKERS = [
+  {g:"People-search sites", id:"whitepages", n:"Whitepages", u:"https://www.whitepages.com/suppression-requests", how:"Paste your listing URL; they verify by an automated phone call."},
+  {g:"People-search sites", id:"spokeo", n:"Spokeo", u:"https://www.spokeo.com/optout", how:"Paste your listing URL and confirm by email. Repeat for each listing."},
+  {g:"People-search sites", id:"peopleconnect", n:"PeopleConnect (Intelius, Instant Checkmate, TruthFinder, US Search, ZabaSearch and more)", u:"https://suppression.peopleconnect.us/login", how:"One suppression request covers their family of sites. Confirm by email."},
+  {g:"People-search sites", id:"beenverified", n:"BeenVerified", u:"https://www.beenverified.com/svc/optout/search/", how:"Search, select your record, confirm by email."},
+  {g:"People-search sites", id:"peoplelooker", n:"PeopleLooker", u:"https://www.peoplelooker.com/f/optout/search/", how:"Search, select your record, confirm by email."},
+  {g:"People-search sites", id:"peoplefinders", n:"PeopleFinders", u:"https://www.peoplefinders.com/opt-out", how:"Search and select your record."},
+  {g:"People-search sites", id:"fastpeoplesearch", n:"FastPeopleSearch", u:"https://www.fastpeoplesearch.com/removal", how:"Search, then 'remove my record'."},
+  {g:"People-search sites", id:"truepeoplesearch", n:"TruePeopleSearch", u:"https://www.truepeoplesearch.com/removal", how:"Search, then 'remove this record'."},
+  {g:"People-search sites", id:"radaris", n:"Radaris", u:"https://radaris.com/control/privacy", how:"Find your profile, request removal."},
+  {g:"People-search sites", id:"thatsthem", n:"ThatsThem", u:"https://thatsthem.com/optout", how:"Fill in the form exactly as your listing shows."},
+  {g:"People-search sites", id:"usphonebook", n:"USPhoneBook", u:"https://www.usphonebook.com/opt-out", how:"Search by name, select your record."},
+  {g:"People-search sites", id:"nuwber", n:"Nuwber", u:"https://nuwber.com/removal/link", how:"Paste your listing URL, confirm by email."},
+  {g:"People-search sites", id:"smartbackgroundchecks", n:"SmartBackgroundChecks", u:"https://www.smartbackgroundchecks.com/remove", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"advancedbackgroundchecks", n:"Advanced Background Checks", u:"https://www.advancedbackgroundchecks.com/removal", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"cyberbackgroundchecks", n:"CyberBackgroundChecks", u:"https://www.cyberbackgroundchecks.com/removal", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"peoplesearchnow", n:"PeopleSearchNow", u:"https://www.peoplesearchnow.com/opt-out", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"searchpeoplefree", n:"SearchPeopleFree", u:"https://www.searchpeoplefree.com/opt-out", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"familytreenow", n:"FamilyTreeNow", u:"https://www.familytreenow.com/optout", how:"Search, select your record, opt out."},
+  {g:"Big data brokers", id:"acxiom", n:"Acxiom", u:"https://isapps.acxiom.com/optout/optout.aspx", how:"Marketing data broker. Online opt-out form."},
+  {g:"Big data brokers", id:"lexisnexis", n:"LexisNexis", u:"https://optout.lexisnexis.com/", how:"Opt-out request form. Some records (like credit-related) can't be removed."},
+  {g:"Stop junk mail, calls and credit offers", id:"optoutprescreen", n:"OptOutPrescreen (prescreened credit and insurance offers)", u:"https://www.optoutprescreen.com/", how:"Official site of the credit bureaus. 5 years online, or permanent by mailed form."},
+  {g:"Stop junk mail, calls and credit offers", id:"dmachoice", n:"DMAchoice (junk mail)", u:"https://www.dmachoice.org/", how:"Reduces marketing mail from member companies."},
+  {g:"Stop junk mail, calls and credit offers", id:"donotcall", n:"National Do Not Call Registry", u:"https://www.donotcall.gov/", how:"Register each phone number."}
+];
+
+var STATUSES = ["Not started","Not listed","Found","Requested","Removed"];
+var CR_STATUSES = ["To send","Sent","Fixed / deleted","Verified as accurate","Need to follow up"];
+var D_STATUSES = ["New","Validation sent","Validated","Negotiating","Agreement in writing","Paid","Confirmed on credit report","Disputed / not mine"];
+
+var SPAM = [
+  {g:"Phone calls", id:"dnc", n:"Register on the National Do Not Call Registry", u:"https://www.donotcall.gov/", how:"Free. Stops calls from legitimate telemarketers after about 31 days. Register each cell and landline number. (Scammers ignore it, so do the other steps too.)"},
+  {g:"Phone calls", id:"silence", n:"Turn on your phone's built-in spam filter", u:"", how:"iPhone: Settings → Phone (or Apps → Phone) → Silence Unknown Callers, or Screen Unknown Callers if your phone has it. Android: Phone app → ⋮ → Settings → Caller ID & spam → turn on Filter spam calls."},
+  {g:"Phone calls", id:"carrier", n:"Turn on your carrier's free call blocking", u:"", how:"AT&T: ActiveArmor app. Verizon: Call Filter app. T-Mobile / Metro: Scam Shield app. Other carriers: search your carrier's name + \"spam call blocking\". The free versions block or label likely scam calls."},
+  {g:"Phone calls", id:"reportcall", n:"Report calls that keep coming", u:"https://www.donotcall.gov/report.html", how:"Report to the Do Not Call registry (FTC). For scams, also report at ReportFraud.ftc.gov. Reports help regulators track and shut down callers."},
+  {g:"Phone calls", id:"voicemail", n:"Set a voicemail PIN", u:"", how:"Stops scammers from getting into your voicemail. Call your own voicemail and set a PIN that isn't 1234 or your birthday."},
+  {g:"Text messages", id:"7726", n:"Forward spam texts to 7726 (spells SPAM)", u:"", how:"Free on all major carriers. Forward the text to 7726, then reply with the sender's number if asked. Then delete and block."},
+  {g:"Text messages", id:"filtertext", n:"Filter texts from unknown senders", u:"", how:"iPhone: Settings → Messages → Unknown & Spam → Filter Unknown Senders. Android (Google Messages): ⋮ → Settings → Spam protection → on."},
+  {g:"Email", id:"spambtn", n:"Use the Report spam / Report phishing button", u:"", how:"In Gmail, Outlook, Yahoo or Apple Mail, mark junk as spam instead of just deleting it. That's what trains your inbox filter."},
+  {g:"Email", id:"phish", n:"Forward phishing emails to the Anti-Phishing Working Group", u:"mailto:reportphishing@apwg.org", how:"Forward fake bank, delivery or account emails to reportphishing@apwg.org (the address the FTC recommends). Report scams at ReportFraud.ftc.gov."},
+  {g:"Email", id:"alias", n:"Use a throwaway email for sign-ups", u:"", how:"Give stores and websites an alias instead of your main email: iCloud Hide My Email, Firefox Relay, or a Gmail plus address (yourname+store@gmail.com). If one starts getting spam, turn it off."},
+  {g:"Email", id:"pwned", n:"Check if your email was in a data breach", u:"https://haveibeenpwned.com/", how:"Free. If it shows up, change that site's password and any place you reused it, and turn on two-step verification."},
+  {g:"Junk mail", id:"prescreen", n:"Stop prescreened credit card and insurance offers", u:"https://www.optoutprescreen.com/", how:"Official credit-bureau site. 5 years online, or permanent with the mailed form."},
+  {g:"Junk mail", id:"dma", n:"Cut marketing mail with DMAchoice", u:"https://www.dmachoice.org/", how:"Small fee for a 10-year registration; reduces catalogs and offers from member companies."},
+  {g:"Report scams", id:"ftc", n:"Know where to report a scam", u:"https://reportfraud.ftc.gov/", how:"ReportFraud.ftc.gov for any scam. If you lost money, also call your bank right away and report to your state attorney general."}
+];
+
+var T_STATUSES = ["New","Traffic school signed up","Traffic school done","Hearing requested","Hearing set","Asked to reduce","Dismissed","Reduced","Paid / responsible"];
+var TICKET_STATE = {
+  AZ: '<h3>Your options in Arizona</h3>'+
+    '<ol class="steps">'+
+    '<li><b>Defensive driving school (dismisses it).</b> If you haven\'t taken it for a dismissal in the past 12 months, one eligible civil charge can be dismissed and kept off your MVD record. Not allowed for crashes with death or serious injury; criminal speeding only with a judge\'s approval; commercial drivers only if they were in a regular (class D or M) vehicle not used for work. Finish it at least about 7 business days before your court date (check your court\'s rule). Asking for a hearing usually gives up this option. <a href="https://www.azcourts.gov/drive" target="_blank" rel="noopener">Find an approved school \u2197</a></li>'+
+    '<li><b>Civil traffic hearing.</b> Plead "not responsible" by the appear-by date. The officer has to prove it is more likely than not. You can question the officer, bring evidence and witnesses. If the officer doesn\'t show up, the case is generally dismissed.</li>'+
+    '<li><b>Ask to reduce it.</b> For criminal traffic charges, a prosecutor may agree to a lesser charge. Use the <b>Reduction request</b> letter.</li>'+
+    '<li><b>Pay it.</b> Admitting means the fine plus points. Most moving violations are 2 to 3 points; 8 or more points in 12 months can mean traffic survival school or a suspension.</li>'+
+    '</ol>'+
+    '<p class="small"><b>Photo radar and red-light cameras:</b> a notice that only came in the mail isn\'t the same as being formally served. In Arizona the case must be filed within about 60 days and then served (handed to you or someone at your home by a process server) within 90 days of filing. Once you\'re served, it\'s real: respond by the deadline.</p>'+
+    '<p class="small">Check your record and points at <a href="https://azmvdnow.gov/" target="_blank" rel="noopener">AZ MVD Now \u2197</a>.</p>',
+  DEFAULT: '<h3>Your options</h3>'+
+    '<ol class="steps">'+
+    '<li><b>Traffic school or a deferral program.</b> Many states and courts let you take a class, or stay ticket-free for a set time, to dismiss the ticket or keep points off. Call the court on your ticket and ask.</li>'+
+    '<li><b>Contest it.</b> Plead not guilty / not responsible by the deadline and ask for a hearing. In California you can also contest by mail ("trial by written declaration").</li>'+
+    '<li><b>Ask to reduce it</b> to a non-moving or lower-point violation. Use the <b>Reduction request</b> letter.</li>'+
+    '<li><b>Pay it.</b> The fine plus points; ask your court about payment plans.</li>'+
+    '</ol><p class="small muted">Set your state on the Start tab for state-specific rules (Arizona is built in so far).</p>'
+};
+
+var BUREAUS = {
+  "Equifax":"Equifax Information Services LLC\nP.O. Box 740256\nAtlanta, GA 30374-0256",
+  "Experian":"Experian\nP.O. Box 4500\nAllen, TX 75013",
+  "TransUnion":"TransUnion Consumer Solutions\nP.O. Box 2000\nChester, PA 19016-2000"
+};
+
+var STATE_LAWS = {
+  CA:"the California Consumer Privacy Act (CCPA), as amended by the CPRA", CO:"the Colorado Privacy Act", CT:"the Connecticut Data Privacy Act",
+  DE:"the Delaware Personal Data Privacy Act", IN:"the Indiana Consumer Data Protection Act", IA:"the Iowa Consumer Data Protection Act",
+  KY:"the Kentucky Consumer Data Protection Act", MD:"the Maryland Online Data Privacy Act", MN:"the Minnesota Consumer Data Privacy Act (Minn. Stat. ch. 325M)",
+  MT:"the Montana Consumer Data Privacy Act", NE:"the Nebraska Data Privacy Act", NH:"New Hampshire's consumer data privacy law (RSA 507-H)",
+  NJ:"the New Jersey Data Privacy Act", OR:"the Oregon Consumer Privacy Act", RI:"the Rhode Island Data Transparency and Privacy Protection Act",
+  TN:"the Tennessee Information Protection Act", TX:"the Texas Data Privacy and Security Act", UT:"the Utah Consumer Privacy Act", VA:"the Virginia Consumer Data Protection Act"
+};
+var STATE_SOL = {
+  AZ:{y:6, t:"In Arizona it's 6 years for credit card and other written-contract debts (A.R.S. § 12-548)."},
+  MN:{y:6, t:"In Minnesota it's generally 6 years for most consumer debts (Minn. Stat. § 541.05)."}
+};
+var STATE_NAMES = {AZ:"Arizona", MN:"Minnesota"};
+var STATES ="AL AK AZ AR CA CO CT DE DC FL GA HI ID IL IN IA KS KY LA ME MD MA MI MN MS MO MT NE NV NH NJ NM NY NC ND OH OK OR PA RI SC SD TN TX UT VT VA WA WV WI WY".split(" ");
+
+/* ---------- storage ---------- */
+function blank(){ return {profile:{}, brokers:{}, custom:[], credit:[], debts:[], spam:{}, tickets:[]}; }
+function load(){
+  try{ var s = localStorage.getItem(KEY); if(s){ var d = JSON.parse(s); return Object.assign(blank(), d); } }catch(e){}
+  return mem || blank();
+}
+var S = load();
+function save(){
+  mem = S;
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){}
+  renderHome();
+}
+
+/* ---------- helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];}); }
+function uid(){ return Math.random().toString(36).slice(2,10); }
+function today(){ var d=new Date(); return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+function addDays(iso,n){ if(!iso) return ""; var d=new Date(iso+"T12:00:00"); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function daysUntil(iso){ var a=new Date(iso+"T12:00:00"), b=new Date(today()+"T12:00:00"); return Math.round((a-b)/86400000); }
+function nice(iso){ if(!iso) return ""; var d=new Date(iso+"T12:00:00"); return d.toLocaleDateString(undefined,{month:"short",day:"numeric",year:"numeric"}); }
+function longDate(){ return new Date().toLocaleDateString("en-US",{month:"long",day:"numeric",year:"numeric"}); }
+function money(n){ n=Number(n)||0; return "$"+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function P(){ return S.profile||{}; }
+function sender(){
+  var p=P(); var lines=[p.name||"[Your full name]", p.street||"[Street address]", ((p.city||"[City]")+", "+(p.state||"[ST]")+" "+(p.zip||"[ZIP]")).trim()];
+  return lines.join("\n");
+}
+function stateLaw(){ return STATE_LAWS[P().state] || "applicable state and federal privacy laws"; }
+function solYears(){ var s=STATE_SOL[P().state]; return s ? s.y : 3; }
+function solShort(){ var s=STATE_SOL[P().state]; return s ? (STATE_NAMES[P().state]||P().state)+": "+s.y+" years for most card debts" : "often 3 to 6 years; check your state"; }
+function renderLaw(){
+  var st=P().state, sol=STATE_SOL[st];
+  $("solText").textContent = sol ? sol.t : "It's often 3 to 6 years and varies by state and debt type. Set your state on the Start tab.";
+  $("lawNote").innerHTML = !st ? "Set your state on the Start tab so requests cite the right law." :
+    STATE_LAWS[st] ? "Your requests will cite <b>"+esc(STATE_LAWS[st])+"</b>, which gives you the right to have businesses delete your data." :
+    "<b>"+esc(STATE_NAMES[st]||st)+" doesn't have a general consumer privacy law yet</b>, so requests are made as a courtesy request. Most people-search sites still remove listings for anyone who asks. If a site refuses or ignores you, you can complain to your state attorney general.";
+}
+
+/* ---------- tabs ---------- */
+function go(t){
+  document.querySelectorAll("nav button").forEach(function(b){ b.classList.toggle("on", b.dataset.tab===t); });
+  document.querySelectorAll("section.tab").forEach(function(s){ s.classList.toggle("on", s.id==="tab-"+t); });
+  window.scrollTo(0,0);
+  try{ sessionStorage.setItem(KEY+".tab", t); }catch(e){}
+}
+$("nav").addEventListener("click", function(e){ var b=e.target.closest("button"); if(b) go(b.dataset.tab); });
+document.addEventListener("click", function(e){ var a=e.target.closest("[data-go]"); if(a){ e.preventDefault(); go(a.dataset.go); } });
+
+/* ---------- modal ---------- */
+var mailTo = null, mailSubj = "";
+function openLetter(title, text, hint, email){
+  $("mTitle").textContent = title; $("mText").value = text; $("mHint").textContent = hint||"Edit anything before you copy, print or email. Fill in any [brackets].";
+  mailTo = email || null; mailSubj = title; $("mMail").style.display = "";
+  $("modal").classList.add("on");
+}
+$("mClose").onclick = function(){ $("modal").classList.remove("on"); };
+$("modal").addEventListener("click", function(e){ if(e.target.id==="modal") $("modal").classList.remove("on"); });
+$("mCopy").onclick = function(){
+  var t=$("mText"); t.select();
+  (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).then(function(){ $("mCopy").textContent="Copied"; setTimeout(function(){$("mCopy").textContent="Copy";},1500); }, function(){ try{document.execCommand("copy");}catch(e){} });
+};
+$("mPrint").onclick = function(){
+  var w = window.open("", "_blank"); if(!w) return;
+  w.document.write("<!doctype html><title>Letter</title><pre style='font:14px/1.5 Georgia,serif;white-space:pre-wrap;max-width:680px;margin:40px auto'>"+esc($("mText").value)+"</pre>");
+  w.document.close(); w.focus(); w.print();
+};
+$("mMail").onclick = function(){
+  var body = $("mText").value, subj = /removal/i.test(mailSubj) ? "Request to delete my personal information" : mailSubj;
+  var m = body.match(/^Subject: (.*)\n\n/); if(m){ subj=m[1]; body=body.slice(m[0].length); }
+  var to = (mailTo && mailTo.indexOf("@")>0) ? mailTo : "";
+  location.href = "mailto:"+encodeURIComponent(to)+"?subject="+encodeURIComponent(subj)+"&body="+encodeURIComponent(body);
+};
+
+/* ---------- profile ---------- */
+(function(){
+  var sel=$("stateSel"); sel.innerHTML = '<option value="">—</option>' + STATES.map(function(s){return '<option>'+s+'</option>';}).join("");
+  document.querySelectorAll("[data-p]").forEach(function(el){
+    el.value = P()[el.dataset.p] || "";
+    el.addEventListener("input", function(){ S.profile[el.dataset.p] = el.value; save(); });
+    el.addEventListener("change", function(){ S.profile[el.dataset.p] = el.value; save(); });
+  });
+})();
+
+/* ---------- remove my info ---------- */
+function allSites(){ return BROKERS.concat((S.custom||[]).map(function(c){ return {g:"Sites I added", id:c.id, n:c.n, u:c.u, how:"", custom:true}; })); }
+function bstate(id){ return S.brokers[id] || (S.brokers[id] = {status:"Not started", date:"", notes:""}); }
+function chipFor(st){
+  if(st==="Removed"||st==="Not listed") return "ok";
+  if(st==="Requested") return "warn";
+  if(st==="Found") return "bad";
+  return "";
+}
+function renderBrokers(){
+  var groups = {}, order=[];
+  allSites().forEach(function(b){ if(!groups[b.g]){groups[b.g]=[];order.push(b.g);} groups[b.g].push(b); });
+  var html = "";
+  order.forEach(function(g){
+    html += '<div class="card"><h3>'+esc(g)+'</h3><div class="list">';
+    groups[g].forEach(function(b){
+      var s = S.brokers[b.id] || {status:"Not started", date:"", notes:""};
+      var isEmail = b.u && b.u.indexOf("@")>0 && b.u.indexOf("http")!==0;
+      var recheck = (s.status==="Requested"||s.status==="Removed") && s.date ? addDays(s.date,90) : "";
+      var due = recheck ? daysUntil(recheck) : null;
+      html += '<div class="item" data-id="'+esc(b.id)+'"><div class="top"><div style="flex:1;min-width:200px">'+
+        '<div class="name">'+esc(b.n)+'</div>'+
+        (b.how?'<div class="small muted">'+esc(b.how)+'</div>':'')+
+        '<div class="small" style="margin-top:4px">'+
+          (isEmail ? '<a href="#" data-mail="'+esc(b.u)+'">Email '+esc(b.u)+'</a>' : (b.u?'<a href="'+esc(b.u)+'" target="_blank" rel="noopener">Open opt-out page ↗</a>':''))+
+          (recheck ? ' · <span class="chip '+(due<=0?'bad':'')+'">Re-check '+(due<=0?'now':nice(recheck))+'</span>' : '')+
+        '</div></div>'+
+        '<div class="row"><span class="chip '+chipFor(s.status)+'">'+esc(s.status)+'</span>'+
+        '<select data-f="status">'+STATUSES.map(function(x){return '<option'+(x===s.status?' selected':'')+'>'+x+'</option>';}).join("")+'</select>'+
+        '<input type="date" data-f="date" value="'+esc(s.date)+'" title="Date requested">'+
+        (b.custom?'<button class="btn danger sm" data-del="'+esc(b.id)+'">Remove</button>':'')+
+        '</div></div>'+
+        '<input data-f="notes" placeholder="Notes (listing URL, confirmation #)" value="'+esc(s.notes)+'" style="margin-top:8px;font-size:14px">'+
+      '</div>';
+    });
+    html += '</div></div>';
+  });
+  $("brokerGroups").innerHTML = html;
+  var sites = allSites(), done = sites.filter(function(b){ var st=(S.brokers[b.id]||{}).status; return st==="Removed"||st==="Not listed"; }).length;
+  var req = sites.filter(function(b){ return (S.brokers[b.id]||{}).status==="Requested"; }).length;
+  $("remCount").textContent = done+" of "+sites.length+" done · "+req+" waiting";
+  $("remBar").style.width = Math.round(100*done/sites.length)+"%";
+}
+$("brokerGroups").addEventListener("change", function(e){
+  var it=e.target.closest(".item"); if(!it||!e.target.dataset.f) return;
+  var s=bstate(it.dataset.id); s[e.target.dataset.f]=e.target.value;
+  if(e.target.dataset.f==="status" && (s.status==="Requested") && !s.date) s.date=today();
+  save(); renderBrokers();
+});
+$("brokerGroups").addEventListener("input", function(e){
+  if(e.target.dataset.f!=="notes") return; var it=e.target.closest(".item"); bstate(it.dataset.id).notes=e.target.value; save();
+});
+$("brokerGroups").addEventListener("click", function(e){
+  var d=e.target.closest("[data-del]");
+  if(d){ if(confirmBox("Remove this site from your list?")){ S.custom=S.custom.filter(function(c){return c.id!==d.dataset.del;}); delete S.brokers[d.dataset.del]; save(); renderBrokers(); } return; }
+  var m=e.target.closest("[data-mail]");
+  if(m){ e.preventDefault(); openLetter("Removal request email", removalEmail(), "Send from the email you want confirmations at.", m.dataset.mail); }
+});
+$("cAdd").onclick = function(){
+  var n=$("cName").value.trim(), u=$("cUrl").value.trim(); if(!n) return;
+  if(u && u.indexOf("@")<0 && !/^https?:\/\//i.test(u)) u="https://"+u;
+  S.custom.push({id:"c_"+uid(), n:n, u:u}); $("cName").value=""; $("cUrl").value=""; save(); renderBrokers();
+};
+function removalEmail(){
+  var p=P();
+  return "Subject: Request to delete my personal information\n\n"+
+  "To the Privacy Team,\n\n"+
+  "I am requesting that you delete all personal information you hold about me, remove any profiles or listings about me from your website(s), and stop selling or sharing my information. I make this request under "+stateLaw()+" and any other law that applies.\n\n"+
+  "To help you find my records:\n"+
+  "Name: "+(p.name||"[Full name]")+(p.otherNames?" (also: "+p.otherNames+")":"")+"\n"+
+  "Current address: "+(p.street?p.street+", ":"")+(p.city||"[City]")+", "+(p.state||"[ST]")+" "+(p.zip||"")+"\n"+
+  (p.pastAddresses?"Past addresses:\n"+p.pastAddresses+"\n":"")+
+  (p.phones?"Phone: "+p.phones+"\n":"")+
+  (p.email?"Email: "+p.email+"\n":"")+
+  "Listing URL(s): [paste if you have them]\n\n"+
+  "Please confirm in writing when this is complete. Use this information only to process my request.\n\n"+
+  "Thank you,\n"+(p.name||"[Your name]");
+}
+$("emailReq").onclick = function(){ openLetter("Removal request email", removalEmail(), "Use this for sites that only take requests by email. Paste the site's privacy email into the To line.", "?"); };
+$("googleMe").onclick = function(){
+  var p=P(); if(!p.name){ alertBox("Add your name on the Start tab first."); return; }
+  var q='"'+p.name+'"'+(p.city?' "'+p.city+'"':'');
+  window.open("https://www.google.com/search?q="+encodeURIComponent(q), "_blank", "noopener");
+};
+
+/* ---------- credit ---------- */
+$("crAdd").onclick = function(){
+  var co=$("crCo").value.trim(); if(!co && $("crType").value!=="Wrong personal information"){ $("crCo").focus(); return; }
+  S.credit.unshift({id:uid(), to:$("crTo").value, co:co, acct:$("crAcct").value.trim(), type:$("crType").value, why:$("crWhy").value.trim(), status:"To send", sent:"", result:""});
+  $("crCo").value=""; $("crAcct").value=""; $("crWhy").value=""; save(); renderCredit();
+};
+function renderCredit(){
+  if(!S.credit.length){ $("crList").innerHTML='<p class="muted small">Nothing logged yet. If your reports look right, great: keep checking every few months.</p>'; return; }
+  $("crList").innerHTML = S.credit.map(function(c){
+    var due = c.sent && (c.status==="Sent") ? addDays(c.sent,30) : "";
+    var dd = due ? daysUntil(due) : null;
+    var cls = c.status==="Fixed / deleted" ? "ok" : (c.status==="Verified as accurate"||c.status==="Need to follow up") ? "bad" : c.status==="Sent" ? "warn" : "";
+    return '<div class="item" data-id="'+c.id+'"><div class="top"><div style="flex:1;min-width:200px">'+
+      '<div class="name">'+esc(c.co||"Personal info")+(c.acct?' ····'+esc(c.acct):'')+'</div>'+
+      '<div class="small muted">'+esc(c.type)+' · to '+esc(c.to)+'</div>'+
+      (c.why?'<div class="small" style="margin-top:4px">'+esc(c.why)+'</div>':'')+
+      (due?'<div class="small" style="margin-top:4px"><span class="chip '+(dd<0?'bad':'warn')+'">Response due '+nice(due)+(dd<0?' (overdue)':'')+'</span></div>':'')+
+      '</div><div class="row"><span class="chip '+cls+'">'+esc(c.status)+'</span>'+
+      '<select data-f="status">'+CR_STATUSES.map(function(x){return '<option'+(x===c.status?' selected':'')+'>'+x+'</option>';}).join("")+'</select>'+
+      '<input type="date" data-f="sent" value="'+esc(c.sent)+'" title="Date mailed"></div></div>'+
+      '<input data-f="result" placeholder="Result / notes (tracking #, what they said)" value="'+esc(c.result)+'" style="margin-top:8px;font-size:14px">'+
+      '<div class="row" style="margin-top:8px"><button class="btn sm" data-act="letter">Dispute letter</button>'+
+      (c.status==="Verified as accurate"?'<button class="btn ghost sm" data-act="followup">Follow-up letter</button>':'')+
+      '<button class="btn danger sm" data-act="del">Delete</button></div></div>';
+  }).join("");
+}
+function findCr(id){ return S.credit.filter(function(c){return c.id===id;})[0]; }
+$("crList").addEventListener("change", function(e){
+  var it=e.target.closest(".item"); if(!it||!e.target.dataset.f) return; var c=findCr(it.dataset.id);
+  c[e.target.dataset.f]=e.target.value; if(e.target.dataset.f==="status" && c.status==="Sent" && !c.sent) c.sent=today();
+  save(); renderCredit();
+});
+$("crList").addEventListener("input", function(e){ if(e.target.dataset.f!=="result") return; findCr(e.target.closest(".item").dataset.id).result=e.target.value; save(); });
+$("crList").addEventListener("click", function(e){
+  var b=e.target.closest("[data-act]"); if(!b) return; var c=findCr(b.closest(".item").dataset.id);
+  if(b.dataset.act==="del"){ if(confirmBox("Delete this item?")){ S.credit=S.credit.filter(function(x){return x!==c;}); save(); renderCredit(); } return; }
+  if(b.dataset.act==="letter") openLetter("Dispute letter: "+(c.co||"personal info"), disputeLetter(c), c.to==="All three bureaus" ? "Print one copy for each bureau and change the address block on each." : null);
+  if(b.dataset.act==="followup") openLetter("Follow-up: method of verification", followupLetter(c));
+});
+function itemLine(c){
+  return "Company: "+(c.co||"(personal information section)")+"\n"+(c.acct?"Account ending in: "+c.acct+"\n":"")+"Problem: "+c.type+"\n"+"Details: "+(c.why||"[Explain what is wrong and what it should say]");
+}
+function disputeLetter(c){
+  var p=P(), direct = c.to==="The creditor directly";
+  var to = direct ? (c.co||"[Creditor name]")+"\nAttn: Credit Bureau Disputes\n[Creditor address from your statement or report]" :
+           c.to==="All three bureaus" ? BUREAUS.Equifax+"\n\n(also send to Experian and TransUnion)" : BUREAUS[c.to];
+  var law = direct ? "Section 623 of the Fair Credit Reporting Act (15 U.S.C. § 1681s-2)" : "Section 611 of the Fair Credit Reporting Act (15 U.S.C. § 1681i)";
+  return sender()+"\n\n"+longDate()+"\n\n"+to+"\n\n"+
+  "Re: Dispute of inaccurate information on my credit report\n\n"+
+  "To whom it may concern,\n\n"+
+  "I am writing under "+law+" to dispute the following information"+(direct?" that you are reporting to the credit bureaus":" in my credit file")+". It is inaccurate or incomplete.\n\n"+
+  itemLine(c)+"\n\n"+
+  "Please investigate and "+(c.type==="Not my account"||c.type==="Duplicate account"||c.type==="Too old to report (over 7 years)"||c.type==="Inquiry I didn't authorize" ? "delete this item" : "correct this item")+
+  ". If you cannot verify it, it must be removed. Please send me the results in writing"+(direct?"":" and a free updated copy of my credit report")+".\n\n"+
+  "Identifying information:\nFull name: "+(p.name||"[Full name]")+"\nDate of birth: [write by hand]\nSocial Security number: [write by hand]\nCurrent address: shown above"+(p.pastAddresses?"\nPrevious addresses:\n"+p.pastAddresses:"")+"\n\n"+
+  "Enclosed:\n- Copy of my driver's license or state ID\n- Copy of a utility bill or bank statement showing my address\n- Copy of the credit report page with this item circled\n- [Any proof: statements, letters, receipts]\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+function followupLetter(c){
+  var p=P(), to = BUREAUS[c.to] || "[Bureau or creditor address]";
+  return sender()+"\n\n"+longDate()+"\n\n"+to+"\n\n"+
+  "Re: Request for description of the procedure used to verify disputed information\n\n"+
+  "To whom it may concern,\n\n"+
+  "I disputed the item below"+(c.sent?" by letter mailed "+nice(c.sent):"")+" and was told it was verified as accurate. Under Section 611(a)(7) of the Fair Credit Reporting Act (15 U.S.C. § 1681i(a)(7)), please send me a description of the procedure used to determine its accuracy, including the business name, address and phone number of anyone contacted.\n\n"+
+  itemLine(c)+"\n\n"+
+  "I continue to dispute this information. [Add any new proof and explain it here.]\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+$("goodwillBtn").onclick = function(){
+  var p=P();
+  openLetter("Goodwill letter", sender()+"\n\n"+longDate()+"\n\n[Creditor name]\n[Customer service or executive office address]\n\n"+
+  "Re: Goodwill adjustment request, account ending in [last 4]\n\n"+
+  "Dear [Creditor] team,\n\n"+
+  "I have been a customer since [year] and value the account. In [month/year] my payment was late because [brief, honest reason, e.g. a billing address change or a family emergency]. I paid as soon as I realized, and my account has been in good standing since.\n\n"+
+  "That one late payment is still on my credit report. I am asking you, as a goodwill gesture, to remove the late payment notation for [month/year] from your reporting to the credit bureaus. I understand you are not required to, and I appreciate you considering it.\n\n"+
+  "Thank you,\n\n\n"+(p.name||"[Your name]")+(p.phones?"\n"+p.phones:""),
+  "Goodwill letters work best for one-time lates on otherwise good accounts. Keep it short and polite.");
+};
+$("denialBtn").onclick = function(){
+  var p=P();
+  openLetter("Ask a lender why I was denied", sender()+"\n\n"+longDate()+"\n\n[Lender name]\n[Address from the denial notice or the bank's website]\n\n"+
+  "Re: Request for the specific reasons for denial of my credit application\n\n"+
+  "To whom it may concern,\n\n"+
+  "On [date] I applied for [card or loan name] and my application was denied. Under the Equal Credit Opportunity Act and Regulation B (12 C.F.R. § 1002.9), I request a written statement of the specific reasons for the denial.\n\n"+
+  "Under Section 615 of the Fair Credit Reporting Act, please also tell me the name, address and phone number of each credit bureau whose report you used, and the credit score and key factors used in the decision.\n\n"+
+  "Applicant name: "+(p.name||"[Full name]")+"\nApplication or reference number (if any): [number]\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]"),
+  "Send within 60 days of the denial. Then pull that bureau's report (free) and check it. If you have a credit freeze there, that alone can cause a denial.");
+};
+
+/* ---------- debts ---------- */
+$("dAdd").onclick = function(){
+  var col=$("dCol").value.trim(); if(!col){ $("dCol").focus(); return; }
+  S.debts.unshift({id:uid(), col:col, orig:$("dOrig").value.trim(), bal:parseFloat(String($("dBal").value).replace(/[$,]/g,""))||0, acct:$("dAcct").value.trim(),
+    first:$("dFirst").value, last:$("dLast").value, addr:$("dAddr").value.trim(), status:"New", pct:40, offers:[], notes:""});
+  ["dCol","dOrig","dBal","dAcct","dFirst","dLast","dAddr"].forEach(function(i){$(i).value="";}); save(); renderDebts();
+};
+function yearsSince(iso){ if(!iso) return null; return (new Date()-new Date(iso+"T12:00:00"))/(365.25*86400000); }
+function renderDebts(){
+  if(!S.debts.length){ $("dList").innerHTML='<div class="card"><p class="muted small" style="margin:0">No debts added.</p></div>'; return; }
+  $("dList").innerHTML = S.debts.map(function(d){
+    var vDue = d.first ? addDays(d.first,30) : "", vd = vDue?daysUntil(vDue):null;
+    var age = yearsSince(d.last);
+    var offer = Math.round((d.bal||0)*(d.pct||0)/100*100)/100, forgiven = Math.max(0,(d.bal||0)-offer);
+    var ageNote = age===null ? "" : '<span class="chip '+(age>=solYears()?'bad':age>=solYears()-2?'warn':'')+'">Last payment '+age.toFixed(1)+' yrs ago</span>';
+    return '<div class="item" data-id="'+d.id+'"><div class="top"><div style="flex:1;min-width:200px">'+
+      '<div class="name">'+esc(d.col)+(d.acct?' ····'+esc(d.acct):'')+'</div>'+
+      '<div class="small muted">'+(d.orig?'Original creditor: '+esc(d.orig)+' · ':'')+'Balance claimed: '+money(d.bal)+'</div>'+
+      '<div class="small" style="margin-top:4px">'+
+        (vDue && d.status==="New" ? '<span class="chip '+(vd<0?'bad':'warn')+'">Validation window '+(vd<0?'passed '+nice(vDue)+' (you can still ask)':'ends '+nice(vDue))+'</span>':'')+ageNote+
+      '</div>'+
+      (age!==null && age>=solYears()-2 ? '<div class="small warn" style="margin:8px 0 0;padding:8px 10px">This debt may be near or past the time limit to sue in your state ('+esc(solShort())+'). Check before paying or agreeing you owe it, since that can restart the clock in some states. Most negative items also stop appearing on credit reports about 7 years after the first missed payment.</div>':'')+
+      '</div><div class="row"><select data-f="status">'+D_STATUSES.map(function(x){return '<option'+(x===d.status?' selected':'')+'>'+x+'</option>';}).join("")+'</select></div></div>'+
+      '<div class="grid" style="margin-top:10px">'+
+        '<div><label>Target settlement (% of balance)</label><input data-f="pct" type="number" min="5" max="100" value="'+esc(d.pct)+'"></div>'+
+        '<div><label>That offer is</label><div style="padding:8px 0"><b>'+money(offer)+'</b> <span class="small muted">· forgiven '+money(forgiven)+'</span></div></div>'+
+      '</div>'+
+      (forgiven>=600?'<div class="small muted">Forgiven amount of $600 or more: expect a 1099-C. It may count as income unless you were insolvent (IRS Form 982).</div>':'')+
+      '<details style="margin-top:10px"><summary>Offer log ('+d.offers.length+')</summary>'+
+        '<div class="scroll" style="margin-top:6px"><table><tr><th>Date</th><th>Who</th><th>Amount</th><th>Note</th><th></th></tr>'+
+        d.offers.map(function(o,i){ return '<tr><td>'+nice(o.date)+'</td><td>'+esc(o.who)+'</td><td>'+money(o.amt)+'</td><td>'+esc(o.note)+'</td><td><button class="btn danger sm" data-act="offdel" data-i="'+i+'">×</button></td></tr>'; }).join("")+
+        '</table></div>'+
+        '<div class="grid" style="margin-top:8px;grid-template-columns:1fr 1fr 1fr">'+
+          '<div><label>Who offered</label><select class="oWho"><option>Me</option><option>Them</option></select></div>'+
+          '<div><label>Amount ($)</label><input class="oAmt" inputmode="decimal"></div>'+
+          '<div><label>Note / deadline</label><input class="oNote"></div>'+
+        '</div><div class="row" style="margin-top:8px"><button class="btn ghost sm" data-act="offadd">Log offer</button></div>'+
+      '</details>'+
+      '<input data-f="notes" placeholder="Notes (call log, names, reference #s)" value="'+esc(d.notes)+'" style="margin-top:6px;font-size:14px">'+
+      '<div class="row" style="margin-top:8px">'+
+        '<button class="btn sm" data-act="valid">Validation letter</button>'+
+        '<button class="btn sm" data-act="offer">Settlement offer</button>'+
+        '<button class="btn ghost sm" data-act="agree">Written agreement request</button>'+
+        '<button class="btn ghost sm" data-act="writing">Contact me in writing only</button>'+
+        '<button class="btn danger sm" data-act="del">Delete</button>'+
+      '</div></div>';
+  }).join("");
+}
+function findD(id){ return S.debts.filter(function(d){return d.id===id;})[0]; }
+$("dList").addEventListener("change", function(e){
+  var it=e.target.closest(".item"); if(!it||!e.target.dataset.f) return; var d=findD(it.dataset.id);
+  var f=e.target.dataset.f; d[f] = f==="pct" ? Math.max(1,Math.min(100,parseFloat(e.target.value)||0)) : e.target.value; save(); renderDebts();
+});
+$("dList").addEventListener("input", function(e){ if(e.target.dataset.f!=="notes") return; findD(e.target.closest(".item").dataset.id).notes=e.target.value; save(); });
+$("dList").addEventListener("click", function(e){
+  var b=e.target.closest("[data-act]"); if(!b) return; var it=b.closest(".item"), d=findD(it.dataset.id), a=b.dataset.act;
+  if(a==="del"){ if(confirmBox("Delete this debt and its offer log?")){ S.debts=S.debts.filter(function(x){return x!==d;}); save(); renderDebts(); } return; }
+  if(a==="offadd"){ var amt=parseFloat(String(it.querySelector(".oAmt").value).replace(/[$,]/g,"")); if(!amt) return;
+    d.offers.push({date:today(), who:it.querySelector(".oWho").value, amt:amt, note:it.querySelector(".oNote").value}); save(); renderDebts();
+    var det=document.querySelector('.item[data-id="'+d.id+'"] details'); if(det) det.open=true; return; }
+  if(a==="offdel"){ d.offers.splice(+b.dataset.i,1); save(); renderDebts(); var det2=document.querySelector('.item[data-id="'+d.id+'"] details'); if(det2) det2.open=true; return; }
+  if(a==="valid") openLetter("Debt validation request", validationLetter(d), "Send certified mail within 30 days of their first notice. Don't admit the debt is yours or promise to pay.");
+  if(a==="offer") openLetter("Settlement offer", offerLetter(d), "Only offer what you can pay as a lump sum. Nothing is final until you have their written agreement.");
+  if(a==="agree") openLetter("Request for written settlement agreement", agreeLetter(d), "Don't send money until you receive and keep a signed copy of these terms.");
+  if(a==="writing") openLetter("Contact me in writing only", writingLetter(d));
+});
+function debtTo(d){ return (d.col||"[Collector]")+"\n"+(d.addr||"[Collector mailing address]"); }
+function debtRef(d){ return "Re: Account "+(d.acct?"ending/reference "+d.acct:"[reference #]")+(d.orig?" (original creditor: "+d.orig+")":"")+"\nAmount claimed: "+money(d.bal); }
+function validationLetter(d){
+  var p=P();
+  return sender()+"\n\n"+longDate()+"\n\n"+debtTo(d)+"\n\n"+debtRef(d)+"\n\n"+
+  "To whom it may concern,\n\n"+
+  "I am responding to your "+(d.first?"letter dated "+nice(d.first):"recent contact")+". This is not a refusal to pay; I am requesting validation of this debt under the Fair Debt Collection Practices Act, 15 U.S.C. § 1692g, and Regulation F.\n\n"+
+  "Please provide:\n"+
+  "1. The name of the original creditor and the account number with that creditor.\n"+
+  "2. An itemization of the amount claimed: the balance on the itemization date, and all interest, fees, payments and credits since.\n"+
+  "3. Proof that you own this debt or are authorized to collect it, including the chain of assignment if it was sold.\n"+
+  "4. A copy of the signed agreement or other documents showing I am responsible for it.\n"+
+  "5. The date of the first delinquency and the date of the last payment.\n"+
+  "6. Your license to collect debts in "+(p.state||"my state")+", if one is required.\n\n"+
+  "Please stop collection activity until you provide this. If you report this account to the credit bureaus, it must be marked as disputed.\n\n"+
+  "Please communicate with me in writing only, at the address above.\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+function offerLetter(d){
+  var p=P(), amt = Math.round((d.bal||0)*(d.pct||0)/100*100)/100;
+  return sender()+"\n\n"+longDate()+"\n\n"+debtTo(d)+"\n\n"+debtRef(d)+"\n\n"+
+  "To whom it may concern,\n\n"+
+  "I am writing to propose a settlement of the account above. Due to my financial circumstances, I am not able to pay the full balance. I am able to offer a one-time lump-sum payment of "+money(amt)+" as payment in full settlement of this account.\n\n"+
+  "This offer is made on the following conditions:\n"+
+  "1. You agree in writing, on your letterhead, that "+money(amt)+" settles this account in full and that no remaining balance will be collected or sold to anyone else.\n"+
+  "2. [Choose one] You will request deletion of this account from all credit bureaus  /  You will report the account as \"settled in full\" with a $0 balance.\n"+
+  "3. Payment will be made within [10] days of my receiving your signed agreement, by [cashier's check / one-time payment]. I will not authorize ongoing access to my bank account.\n\n"+
+  "This letter is not an acknowledgment that I owe this debt or that it is valid, and it is made for settlement purposes only. This offer expires [date, about 14 days out].\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+function agreeLetter(d){
+  var p=P(), last = d.offers.length ? d.offers[d.offers.length-1].amt : Math.round((d.bal||0)*(d.pct||0)/100*100)/100;
+  return sender()+"\n\n"+longDate()+"\n\n"+debtTo(d)+"\n\n"+debtRef(d)+"\n\n"+
+  "To whom it may concern,\n\n"+
+  "This confirms our conversation on [date] with [representative name]. Before I make any payment, please send me a signed letter on your company letterhead that states:\n\n"+
+  "1. The account above will be settled in full for a payment of "+money(last)+".\n"+
+  "2. The payment due date and the accepted payment method.\n"+
+  "3. After payment, no balance will remain, and the account will not be sold, transferred or collected further.\n"+
+  "4. How the account will be reported to the credit bureaus: [deleted / \"settled in full,\" $0 balance], and that you will update it within 30 days of payment.\n"+
+  "5. The name and title of the person signing.\n\n"+
+  "I will send payment once I receive this signed agreement.\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+function writingLetter(d){
+  var p=P();
+  return sender()+"\n\n"+longDate()+"\n\n"+debtTo(d)+"\n\n"+debtRef(d)+"\n\n"+
+  "To whom it may concern,\n\n"+
+  "Phone calls about this account are inconvenient for me. Under the Fair Debt Collection Practices Act and Regulation F, please contact me only in writing, by mail at the address above. Do not call me at home, at work or on my cell phone, and do not contact third parties about this account.\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+
+/* ---------- tickets ---------- */
+function bizDaysBefore(iso,n){ var d=new Date(iso+"T12:00:00"); while(n>0){ d.setDate(d.getDate()-1); var w=d.getDay(); if(w!==0&&w!==6) n--; } return d.toISOString().slice(0,10); }
+$("tAdd").onclick = function(){
+  var v=$("tViol").value.trim(); if(!v){ $("tViol").focus(); return; }
+  S.tickets = S.tickets||[];
+  S.tickets.unshift({id:uid(), viol:v, num:$("tNum").value.trim(), date:$("tDate").value, court:$("tCourt").value, courtName:$("tCourtName").value.trim(),
+    fine:parseFloat(String($("tFine").value).replace(/[$,]/g,""))||0, type:$("tType").value, prev:$("tPrev").value, status:"New", notes:""});
+  ["tViol","tNum","tDate","tCourt","tCourtName","tFine"].forEach(function(i){$(i).value="";}); save(); renderTickets();
+};
+function renderTickets(){
+  $("tkState").innerHTML = TICKET_STATE[P().state] || TICKET_STATE.DEFAULT;
+  var T=S.tickets||[];
+  if(!T.length){ $("tList").innerHTML='<div class="card"><p class="muted small" style="margin:0">No tickets added.</p></div>'; return; }
+  $("tList").innerHTML = T.map(function(t){
+    var cd=t.court?daysUntil(t.court):null;
+    var dds = t.court && P().state==="AZ" && t.type!=="Parking" ? bizDaysBefore(t.court,7) : "";
+    var open = ["Dismissed","Reduced","Paid / responsible"].indexOf(t.status)<0;
+    var cls = t.status==="Dismissed"?"ok":t.status==="Paid / responsible"?"":open?"warn":"";
+    return '<div class="item" data-id="'+t.id+'"><div class="top"><div style="flex:1;min-width:200px">'+
+      '<div class="name">'+esc(t.viol)+'</div>'+
+      '<div class="small muted">'+esc(t.type)+(t.courtName?' · '+esc(t.courtName):'')+(t.num?' · #'+esc(t.num):'')+(t.fine?' · fine '+money(t.fine):'')+'</div>'+
+      '<div class="small" style="margin-top:4px">'+
+        (t.court&&open?'<span class="chip '+(cd<0?'bad':cd<=14?'warn':'')+'">Court / appear by '+nice(t.court)+(cd<0?' (passed)':'')+'</span>':'')+
+        (dds&&open&&t.prev!=="Yes"&&(t.status==="New"||t.status==="Traffic school signed up")?'<span class="chip">Finish traffic school by about '+nice(dds)+'</span>':'')+
+      '</div>'+
+      (t.prev==="Yes"&&P().state==="AZ"?'<div class="small muted" style="margin-top:4px">Took traffic school in the last 12 months, so it likely can\'t be used for this one. Consider a hearing or a reduction request.</div>':'')+
+      (t.type.indexOf("Photo")===0?'<div class="small muted" style="margin-top:4px">Camera ticket: note whether it only came by mail or you were formally served, and the dates.</div>':'')+
+      '</div><div class="row"><span class="chip '+cls+'">'+esc(t.status)+'</span><select data-f="status">'+T_STATUSES.map(function(x){return '<option'+(x===t.status?' selected':'')+'>'+x+'</option>';}).join("")+'</select></div></div>'+
+      '<input data-f="notes" placeholder="Notes (served date, hearing date, what the court said)" value="'+esc(t.notes)+'" style="margin-top:8px;font-size:14px">'+
+      '<div class="row" style="margin-top:8px">'+
+        '<button class="btn sm" data-act="plea">Not-responsible plea / hearing request</button>'+
+        '<button class="btn sm" data-act="evidence">Evidence request</button>'+
+        '<button class="btn ghost sm" data-act="reduce">Reduction request</button>'+
+        '<button class="btn danger sm" data-act="del">Delete</button>'+
+      '</div></div>';
+  }).join("");
+}
+function findT(id){ return (S.tickets||[]).filter(function(t){return t.id===id;})[0]; }
+$("tList").addEventListener("change", function(e){ var it=e.target.closest(".item"); if(!it||!e.target.dataset.f) return; findT(it.dataset.id)[e.target.dataset.f]=e.target.value; save(); renderTickets(); });
+$("tList").addEventListener("input", function(e){ if(e.target.dataset.f!=="notes") return; findT(e.target.closest(".item").dataset.id).notes=e.target.value; save(); });
+$("tList").addEventListener("click", function(e){
+  var b=e.target.closest("[data-act]"); if(!b) return; var t=findT(b.closest(".item").dataset.id), a=b.dataset.act;
+  if(a==="del"){ if(confirmBox("Delete this ticket?")){ S.tickets=S.tickets.filter(function(x){return x!==t;}); save(); renderTickets(); } return; }
+  if(a==="plea") openLetter("Not-responsible plea and hearing request", pleaLetter(t), "Many courts also take this online or in person. Send it before the appear-by date and keep proof. In Arizona, requesting a hearing usually gives up the traffic school option.");
+  if(a==="evidence") openLetter("Request for evidence", evidenceLetter(t), "Send it to the court and the prosecutor (or the city/police department) as soon as a hearing is set.");
+  if(a==="reduce") openLetter("Request to reduce the charge", reduceLetter(t), "Best for a clean driving record. Be polite and brief.");
+});
+function tHead(t, to){ return sender()+"\n\n"+longDate()+"\n\n"+to+"\n\nRe: Citation / complaint "+(t.num||"[number]")+(t.date?", issued "+nice(t.date):"")+"\nViolation: "+t.viol+(t.court?"\nCourt / appear-by date: "+nice(t.court):"")+"\n\n"; }
+function pleaLetter(t){
+  var p=P();
+  return tHead(t,(t.courtName||"[Court name]")+"\n[Court address]")+"Dear Clerk of the Court,\n\n"+
+  "I plead NOT RESPONSIBLE (not guilty) to the violation above and request a hearing. Please send me written notice of the hearing date and time at the address above.\n\n"+
+  "[Optional: I request that the citing officer be present at the hearing.]\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]")+(p.phones?"\n"+p.phones:"");
+}
+function evidenceLetter(t){
+  var p=P();
+  return tHead(t,(t.courtName||"[Court name]")+" / [Prosecutor or city attorney]\n[Address]")+"To whom it may concern,\n\n"+
+  "I have pleaded not responsible and request copies of the evidence in this case before my hearing, including:\n\n"+
+  "1. The officer's notes, report and any diagrams.\n"+
+  "2. For a speed charge: the make, model and serial number of the radar, laser or other device; its calibration and maintenance records for the 12 months before and after the date of the ticket; and the officer's training and certification records for that device.\n"+
+  "3. Any dashcam, bodycam or photo/video evidence.\n"+
+  (t.type.indexOf("Photo")===0?"4. All photos and video of the violation, the camera's calibration records, and proof of service.\n":"")+
+  "\nPlease send these to the address above. Thank you.\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]");
+}
+function reduceLetter(t){
+  var p=P();
+  return tHead(t,"[Prosecutor / city attorney, or the court for civil tickets]\n[Address]")+"To whom it may concern,\n\n"+
+  "I am writing about the citation above. [I have had a clean driving record for __ years.] [Brief, honest explanation, e.g. I was unfamiliar with the area and missed the speed change.]\n\n"+
+  "I respectfully ask that the charge be reduced to a non-moving or lower-point violation, or that I be allowed to complete a traffic school or deferral program in exchange for dismissal. I am willing to pay a fine or court costs.\n\n"+
+  "Thank you for considering this request.\n\n"+
+  "Sincerely,\n\n\n"+(p.name||"[Your name]")+(p.phones?"\n"+p.phones:"");
+}
+
+/* ---------- spam ---------- */
+function renderSpam(){
+  S.spam = S.spam || {};
+  var groups={}, order=[];
+  SPAM.forEach(function(x){ if(!groups[x.g]){groups[x.g]=[];order.push(x.g);} groups[x.g].push(x); });
+  $("spamGroups").innerHTML = order.map(function(g){
+    return '<div class="card"><h3>'+esc(g)+'</h3><div class="list">'+groups[g].map(function(x){
+      var on=!!S.spam[x.id];
+      return '<label class="item" style="display:flex;gap:12px;align-items:flex-start;cursor:pointer;color:var(--ink);font-size:15px;margin:0">'+
+        '<input type="checkbox" data-spam="'+x.id+'"'+(on?' checked':'')+' style="width:22px;height:22px;flex:0 0 auto;margin-top:2px">'+
+        '<span style="flex:1"><span class="name" style="'+(on?'text-decoration:line-through;color:var(--muted)':'')+'">'+esc(x.n)+'</span>'+
+        '<span class="small muted" style="display:block">'+esc(x.how)+'</span>'+
+        (x.u?'<a class="small" href="'+esc(x.u)+'" target="_blank" rel="noopener">'+(x.u.indexOf("mailto:")===0?"Email "+esc(x.u.slice(7)):"Open site \u2197")+'</a>':'')+
+        '</span></label>';
+    }).join("")+'</div></div>';
+  }).join("");
+  var done=SPAM.filter(function(x){return S.spam[x.id];}).length;
+  $("spamCount").textContent = done+" of "+SPAM.length+" steps done";
+  $("spamBar").style.width = Math.round(100*done/SPAM.length)+"%";
+}
+$("spamGroups").addEventListener("change", function(e){ var id=e.target.dataset.spam; if(!id) return; S.spam=S.spam||{}; S.spam[id]=e.target.checked; save(); renderSpam(); });
+
+/* ---------- home ---------- */
+function renderHome(){
+  renderLaw(); if($("tkState")) $("tkState").innerHTML = TICKET_STATE[P().state] || TICKET_STATE.DEFAULT;
+  var items=[];
+  allSites().forEach(function(b){ var s=S.brokers[b.id]; if(s && (s.status==="Requested"||s.status==="Removed") && s.date){ items.push({d:addDays(s.date,90), t:"Re-check "+b.n, tab:"remove"}); } });
+  S.credit.forEach(function(c){ if(c.status==="Sent" && c.sent) items.push({d:addDays(c.sent,30), t:"Response due: "+(c.co||"personal info")+" ("+c.to+")", tab:"credit"}); });
+  S.debts.forEach(function(d){
+    if(d.status==="New" && d.first) items.push({d:addDays(d.first,30), t:"Validation window ends: "+d.col, tab:"debts"});
+    if(d.status==="Validation sent") items.push({d:"", t:"Waiting on validation from "+d.col, tab:"debts"});
+  });
+  (S.tickets||[]).forEach(function(t){ if(t.court && ["Dismissed","Reduced","Paid / responsible"].indexOf(t.status)<0) items.push({d:t.court, t:"Court / appear by: "+t.viol, tab:"tickets"}); });
+  items.sort(function(a,b){ return (a.d||"9999").localeCompare(b.d||"9999"); });
+  $("deadlines").innerHTML = items.length ? items.slice(0,12).map(function(i){
+    var n=i.d?daysUntil(i.d):null;
+    return '<div class="deadline"><a href="#" data-go="'+i.tab+'">'+esc(i.t)+'</a><span class="chip '+(n!==null&&n<0?'bad':n!==null&&n<=7?'warn':'')+'">'+(i.d?(n<0?'overdue':n===0?'today':nice(i.d)):'open')+'</span></div>';
+  }).join("") : '<p class="muted small" style="margin:0">Nothing due yet. Deadlines show up here as you send requests and letters.</p>';
+  var sites=allSites(), done=sites.filter(function(b){ var st=(S.brokers[b.id]||{}).status; return st==="Removed"||st==="Not listed"; }).length;
+  var crFixed=S.credit.filter(function(c){return c.status==="Fixed / deleted";}).length;
+  var dDone=S.debts.filter(function(d){return d.status==="Paid"||d.status==="Confirmed on credit report"||d.status==="Disputed / not mine";}).length;
+  $("progress").innerHTML =
+    '<div class="small">Sites cleared: <b>'+done+' / '+sites.length+'</b></div><div class="progress"><div style="width:'+Math.round(100*done/sites.length)+'%"></div></div>'+
+    '<div class="small">Credit items fixed: <b>'+crFixed+' / '+S.credit.length+'</b></div><div class="progress"><div style="width:'+(S.credit.length?Math.round(100*crFixed/S.credit.length):0)+'%"></div></div>'+
+    '<div class="small">Spam steps done: <b>'+SPAM.filter(function(x){return (S.spam||{})[x.id];}).length+' / '+SPAM.length+'</b></div><div class="progress"><div style="width:'+Math.round(100*SPAM.filter(function(x){return (S.spam||{})[x.id];}).length/SPAM.length)+'%"></div></div>'+
+    '<div class="small">Debts resolved: <b>'+dDone+' / '+S.debts.length+'</b></div><div class="progress"><div style="width:'+(S.debts.length?Math.round(100*dDone/S.debts.length):0)+'%"></div></div>';
+}
+
+/* ---------- backup ---------- */
+$("bkDown").onclick = function(){
+  var blob=new Blob([JSON.stringify({app:"clean-slate", version:1, saved:new Date().toISOString(), data:S},null,1)],{type:"application/json"});
+  var a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="clean-slate-backup-"+today()+".json"; document.body.appendChild(a); a.click(); setTimeout(function(){URL.revokeObjectURL(a.href); a.remove();},500);
+};
+$("bkUp").onclick = function(){ $("bkFile").click(); };
+$("bkFile").onchange = function(){
+  var f=this.files[0]; if(!f) return; var r=new FileReader();
+  r.onload=function(){ try{ var j=JSON.parse(r.result); var d=j.data||j; if(!d.profile&&!d.brokers) throw 0;
+      if(!confirmBox("Replace what's on this device with the backup from "+(j.saved?new Date(j.saved).toLocaleString():"this file")+"?")) return;
+      S=Object.assign(blank(), d); save(); renderAll(); alertBox("Backup restored."); }catch(e){ alertBox("That file isn't a Clean Slate backup."); } };
+  r.readAsText(f); this.value="";
+};
+$("bkErase").onclick = function(){
+  if(!confirmBox("Erase everything on this device? Download a backup first if you might want it.")) return;
+  S=blank(); try{ localStorage.removeItem(KEY); }catch(e){} mem=null; save(); renderAll();
+  document.querySelectorAll("[data-p]").forEach(function(el){ el.value=""; });
+};
+$("copyLink").onclick = function(){
+  var u=location.href.split("#")[0];
+  if(navigator.clipboard) navigator.clipboard.writeText(u).then(function(){ $("copyLink").textContent="Copied"; });
+};
+
+function confirmBox(msg){ try{ return window.confirm(msg); }catch(e){ return true; } }
+function alertBox(msg){ try{ window.alert(msg); }catch(e){} }
+
+function renderAll(){ renderBrokers(); renderCredit(); renderDebts(); renderTickets(); renderSpam(); renderHome();
+  document.querySelectorAll("[data-p]").forEach(function(el){ el.value = P()[el.dataset.p] || ""; }); }
+renderAll();
+try{ var t=sessionStorage.getItem(KEY+".tab"); if(t && $("tab-"+t)) go(t); }catch(e){}
+})();
+</script>
+</body>
+</html>
