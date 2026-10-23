@@ -161,6 +161,16 @@ footer{color:var(--muted);font-size:12px;text-align:center;padding:20px 16px 40p
     </div>
     <div class="progress"><div id="remBar" style="width:0"></div></div>
   </div>
+  <div class="card" id="bulkCard">
+    <h3>Send one email to all</h3>
+    <p class="small muted" style="margin-top:0">These companies take removal requests by email. Tap the button and your email app opens one message, already filled in, with each company in BCC (they can't see each other). Just tap Send. Some will reply asking you to confirm. Sites that only take web forms are listed below; do those by hand.</p>
+    <div id="bulkList"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="bulkSend">Email all checked</button>
+      <button class="btn ghost sm" id="bulkCopy">Copy addresses</button>
+    </div>
+    <div id="bulkAfter" style="display:none;margin-top:10px" class="note">Did the email send? <button class="btn sm" id="bulkDone">Yes, mark them Requested</button></div>
+  </div>
   <div id="brokerGroups"></div>
   <div class="card">
     <h3>Add another site</h3>
@@ -375,26 +385,29 @@ var KEY = "cleanSlate.v1";
 var mem = null;
 
 var BROKERS = [
-  {g:"People-search sites", id:"whitepages", n:"Whitepages", u:"https://www.whitepages.com/suppression-requests", how:"Paste your listing URL; they verify by an automated phone call."},
+  {g:"People-search sites", id:"whitepages", e:"legal@whitepages.com", n:"Whitepages", u:"https://www.whitepages.com/suppression-requests", how:"Paste your listing URL; they verify by an automated phone call."},
   {g:"People-search sites", id:"spokeo", n:"Spokeo", u:"https://www.spokeo.com/optout", how:"Paste your listing URL and confirm by email. Repeat for each listing."},
   {g:"People-search sites", id:"peopleconnect", n:"PeopleConnect (Intelius, Instant Checkmate, TruthFinder, US Search, ZabaSearch and more)", u:"https://suppression.peopleconnect.us/login", how:"One suppression request covers their family of sites. Confirm by email."},
-  {g:"People-search sites", id:"beenverified", n:"BeenVerified", u:"https://www.beenverified.com/svc/optout/search/", how:"Search, select your record, confirm by email."},
-  {g:"People-search sites", id:"peoplelooker", n:"PeopleLooker", u:"https://www.peoplelooker.com/f/optout/search/", how:"Search, select your record, confirm by email."},
-  {g:"People-search sites", id:"peoplefinders", n:"PeopleFinders", u:"https://www.peoplefinders.com/opt-out", how:"Search and select your record."},
-  {g:"People-search sites", id:"fastpeoplesearch", n:"FastPeopleSearch", u:"https://www.fastpeoplesearch.com/removal", how:"Search, then 'remove my record'."},
-  {g:"People-search sites", id:"truepeoplesearch", n:"TruePeopleSearch", u:"https://www.truepeoplesearch.com/removal", how:"Search, then 'remove this record'."},
+  {g:"People-search sites", id:"beenverified", e:"privacy@ltvco.com", n:"BeenVerified", u:"https://www.beenverified.com/svc/optout/search/", how:"Search, select your record, confirm by email."},
+  {g:"People-search sites", id:"peoplelooker", e:"privacy@ltvco.com", n:"PeopleLooker", u:"https://www.peoplelooker.com/f/optout/search/", how:"Search, select your record, confirm by email."},
+  {g:"People-search sites", id:"peoplefinders", e:"customercare@peoplefinders.com", n:"PeopleFinders", u:"https://www.peoplefinders.com/opt-out", how:"Search and select your record."},
+  {g:"People-search sites", id:"fastpeoplesearch", e:"privacy@mtalley.zendesk.com", n:"FastPeopleSearch", u:"https://www.fastpeoplesearch.com/removal", how:"Search, then 'remove my record'."},
+  {g:"People-search sites", id:"truepeoplesearch", e:"privacy@truepeoplesearch.com", n:"TruePeopleSearch", u:"https://www.truepeoplesearch.com/removal", how:"Search, then 'remove this record'."},
   {g:"People-search sites", id:"radaris", n:"Radaris", u:"https://radaris.com/control/privacy", how:"Find your profile, request removal."},
   {g:"People-search sites", id:"thatsthem", n:"ThatsThem", u:"https://thatsthem.com/optout", how:"Fill in the form exactly as your listing shows."},
-  {g:"People-search sites", id:"usphonebook", n:"USPhoneBook", u:"https://www.usphonebook.com/opt-out", how:"Search by name, select your record."},
-  {g:"People-search sites", id:"nuwber", n:"Nuwber", u:"https://nuwber.com/removal/link", how:"Paste your listing URL, confirm by email."},
-  {g:"People-search sites", id:"smartbackgroundchecks", n:"SmartBackgroundChecks", u:"https://www.smartbackgroundchecks.com/remove", how:"Search, then remove your record."},
-  {g:"People-search sites", id:"advancedbackgroundchecks", n:"Advanced Background Checks", u:"https://www.advancedbackgroundchecks.com/removal", how:"Search, then remove your record."},
-  {g:"People-search sites", id:"cyberbackgroundchecks", n:"CyberBackgroundChecks", u:"https://www.cyberbackgroundchecks.com/removal", how:"Search, then remove your record."},
-  {g:"People-search sites", id:"peoplesearchnow", n:"PeopleSearchNow", u:"https://www.peoplesearchnow.com/opt-out", how:"Search, then remove your record."},
-  {g:"People-search sites", id:"searchpeoplefree", n:"SearchPeopleFree", u:"https://www.searchpeoplefree.com/opt-out", how:"Search, then remove your record."},
-  {g:"People-search sites", id:"familytreenow", n:"FamilyTreeNow", u:"https://www.familytreenow.com/optout", how:"Search, select your record, opt out."},
-  {g:"Big data brokers", id:"acxiom", n:"Acxiom", u:"https://isapps.acxiom.com/optout/optout.aspx", how:"Marketing data broker. Online opt-out form."},
-  {g:"Big data brokers", id:"lexisnexis", n:"LexisNexis", u:"https://optout.lexisnexis.com/", how:"Opt-out request form. Some records (like credit-related) can't be removed."},
+  {g:"People-search sites", id:"usphonebook", e:"privacy@mtalley.zendesk.com", n:"USPhoneBook", u:"https://www.usphonebook.com/opt-out", how:"Search by name, select your record."},
+  {g:"People-search sites", id:"nuwber", e:"support@nuwber.com", n:"Nuwber", u:"https://nuwber.com/removal/link", how:"Paste your listing URL, confirm by email."},
+  {g:"People-search sites", id:"smartbackgroundchecks", e:"privacy@mtalley.zendesk.com", n:"SmartBackgroundChecks", u:"https://www.smartbackgroundchecks.com/remove", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"advancedbackgroundchecks", e:"privacy@mtalley.zendesk.com", n:"Advanced Background Checks", u:"https://www.advancedbackgroundchecks.com/removal", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"cyberbackgroundchecks", e:"privacy@mtalley.zendesk.com", n:"CyberBackgroundChecks", u:"https://www.cyberbackgroundchecks.com/removal", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"peoplesearchnow", e:"privacy@mtalley.zendesk.com", n:"PeopleSearchNow", u:"https://www.peoplesearchnow.com/opt-out", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"searchpeoplefree", e:"privacy@mtalley.zendesk.com", n:"SearchPeopleFree", u:"https://www.searchpeoplefree.com/opt-out", how:"Search, then remove your record."},
+  {g:"People-search sites", id:"familytreenow", e:"privacy@familytreenow.com", n:"FamilyTreeNow", u:"https://www.familytreenow.com/optout", how:"Search, select your record, opt out."},
+  {g:"Big data brokers", id:"acxiom", e:"askprivacy@acxiom.com", n:"Acxiom", u:"https://isapps.acxiom.com/optout/optout.aspx", how:"Marketing data broker. Online opt-out form."},
+  {g:"People-search sites", id:"checkpeople", e:"compliance@checkpeople.com", n:"CheckPeople", u:"https://checkpeople.com/privacy-rights", how:"Privacy request page, or use the one email to all."},
+  {g:"People-search sites", id:"mylife", e:"membersupport@mylife.com", n:"MyLife", u:"https://www.mylife.com", how:"Takes removal requests by email."},
+  {g:"Big data brokers", id:"epsilon", e:"privacy@epsilon.com", n:"Epsilon", u:"https://legal.epsilon.com/dsr/", how:"Marketing data broker. Online request form or email."},
+  {g:"Big data brokers", id:"lexisnexis", e:"privacy.inquiries@lexisnexis.com", n:"LexisNexis", u:"https://optout.lexisnexis.com/", how:"Opt-out request form. Some records (like credit-related) can't be removed."},
   {g:"Stop junk mail, calls and credit offers", id:"optoutprescreen", n:"OptOutPrescreen (prescreened credit and insurance offers)", u:"https://www.optoutprescreen.com/", how:"Official site of the credit bureaus. 5 years online, or permanent by mailed form."},
   {g:"Stop junk mail, calls and credit offers", id:"dmachoice", n:"DMAchoice (junk mail)", u:"https://www.dmachoice.org/", how:"Reduces marketing mail from member companies."},
   {g:"Stop junk mail, calls and credit offers", id:"donotcall", n:"National Do Not Call Registry", u:"https://www.donotcall.gov/", how:"Register each phone number."}
@@ -571,6 +584,7 @@ function renderBrokers(){
         (b.how?'<div class="small muted">'+esc(b.how)+'</div>':'')+
         '<div class="small" style="margin-top:4px">'+
           (isEmail ? '<a href="#" data-mail="'+esc(b.u)+'">Email '+esc(b.u)+'</a>' : (b.u?'<a href="'+esc(b.u)+'" target="_blank" rel="noopener">Open opt-out page ↗</a>':''))+
+          (b.e ? ' · <span class="muted">also in "one email to all"</span>' : '')+
           (recheck ? ' · <span class="chip '+(due<=0?'bad':'')+'">Re-check '+(due<=0?'now':nice(recheck))+'</span>' : '')+
         '</div></div>'+
         '<div class="row"><span class="chip '+chipFor(s.status)+'">'+esc(s.status)+'</span>'+
@@ -588,6 +602,7 @@ function renderBrokers(){
   var req = sites.filter(function(b){ return (S.brokers[b.id]||{}).status==="Requested"; }).length;
   $("remCount").textContent = done+" of "+sites.length+" done · "+req+" waiting";
   $("remBar").style.width = Math.round(100*done/sites.length)+"%";
+  if($("bulkList")) renderBulk();
 }
 $("brokerGroups").addEventListener("change", function(e){
   var it=e.target.closest(".item"); if(!it||!e.target.dataset.f) return;
@@ -604,6 +619,64 @@ $("brokerGroups").addEventListener("click", function(e){
   var m=e.target.closest("[data-mail]");
   if(m){ e.preventDefault(); openLetter("Removal request email", removalEmail(), "Send from the email you want confirmations at.", m.dataset.mail); }
 });
+/* ---------- one email to all ---------- */
+var bulkOff = {};
+function emailOf(b){ return b.e || (b.u && b.u.indexOf("@")>0 && b.u.indexOf("http")!==0 ? b.u : ""); }
+function bulkGroups(){
+  var m = {}, order = [];
+  allSites().forEach(function(b){
+    var e = emailOf(b); if(!e) return; e = e.toLowerCase();
+    var st = (S.brokers[b.id]||{}).status || "Not started";
+    if(!m[e]){ m[e] = {e:e, sites:[], open:0}; order.push(e); }
+    m[e].sites.push(b); if(st==="Not started"||st==="Found") m[e].open++;
+  });
+  return order.map(function(e){ return m[e]; });
+}
+function bulkChecked(){ return bulkGroups().filter(function(g){ return g.open>0 && !bulkOff[g.e]; }); }
+function renderBulk(){
+  var gs = bulkGroups();
+  $("bulkList").innerHTML = gs.map(function(g){
+    var done = g.open===0;
+    return '<label class="small" style="display:flex;gap:8px;align-items:flex-start;margin:6px 0;'+(done?'opacity:.55':'')+'">'+
+      '<input type="checkbox" data-bulk="'+esc(g.e)+'" style="width:auto;margin-top:3px"'+(!done&&!bulkOff[g.e]?' checked':'')+(done?' disabled':'')+'>'+
+      '<span><b>'+esc(g.sites.map(function(b){return b.n.replace(/ \(.*\)$/,"");}).join(", "))+'</b>'+(done?' (already requested or done)':'')+'<br><span class="muted">'+esc(g.e)+'</span></span></label>';
+  }).join("");
+  var n = bulkChecked().length;
+  $("bulkSend").textContent = "Email all checked ("+n+")";
+  $("bulkSend").disabled = n===0;
+}
+$("bulkList").addEventListener("change", function(e){ var c=e.target.closest("[data-bulk]"); if(!c) return; bulkOff[c.dataset.bulk] = !c.checked; renderBulk(); });
+function bulkEmail(){
+  var p=P();
+  return "To the Privacy Team,\n\n"+
+  "I am requesting that you delete all personal information you hold about me, remove any profiles or listings about me from your website(s) and any affiliated sites, and stop selling or sharing my information. I make this request under "+stateLaw()+" and any other law that applies.\n\n"+
+  "To help you find my records:\n"+
+  "Name: "+p.name+(p.otherNames?" (also: "+p.otherNames+")":"")+"\n"+
+  "Current address: "+(p.street?p.street+", ":"")+(p.city||"")+(p.state?", "+p.state:"")+" "+(p.zip||"")+"\n"+
+  (p.pastAddresses?"Past addresses:\n"+p.pastAddresses+"\n":"")+
+  (p.phones?"Phone: "+p.phones+"\n":"")+
+  "Email: "+p.email+"\n\n"+
+  "Please confirm by email when this is complete. Use this information only to process my request.\n\n"+
+  "Thank you,\n"+p.name;
+}
+$("bulkSend").onclick = function(){
+  var p=P();
+  if(!p.name || !p.email){ alertBox("Add your full name and email on the Start tab first."); go("home"); return; }
+  if(!p.state){ if(!confirmBox("Your state isn't set on the Start tab, so the email won't name your state's privacy law. Send anyway?")) return; }
+  var gs = bulkChecked(); if(!gs.length) return;
+  var bcc = gs.map(function(g){return g.e;}).join(",");
+  location.href = "mailto:"+encodeURIComponent(p.email)+"?bcc="+encodeURIComponent(bcc)+"&subject="+encodeURIComponent("Request to delete my personal information")+"&body="+encodeURIComponent(bulkEmail());
+  $("bulkAfter").style.display = "";
+};
+$("bulkCopy").onclick = function(){
+  var t = bulkChecked().map(function(g){return g.e;}).join(", ");
+  (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ $("bulkCopy").textContent="Copied"; setTimeout(function(){$("bulkCopy").textContent="Copy addresses";},1500); }, function(){ window.prompt("Copy these addresses:", t); });
+};
+$("bulkDone").onclick = function(){
+  bulkChecked().forEach(function(g){ g.sites.forEach(function(b){ var s=bstate(b.id); if(s.status==="Not started"||s.status==="Found"){ s.status="Requested"; s.date=today(); s.notes = s.notes || "Sent in one email to all"; } }); });
+  $("bulkAfter").style.display = "none"; save(); renderBrokers();
+};
+
 $("cAdd").onclick = function(){
   var n=$("cName").value.trim(), u=$("cUrl").value.trim(); if(!n) return;
   if(u && u.indexOf("@")<0 && !/^https?:\/\//i.test(u)) u="https://"+u;
